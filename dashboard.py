@@ -5,27 +5,33 @@ import os
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 import random         
+from datetime import datetime
 
 load_dotenv()
 
-LAT=12.912
-LON=77.644
+LAT=25.569
+LON=85.093
 
 userId = os.getenv("USERID")
 password = os.getenv("PASSWORD")
 
 def punchIn(page):
+  print("Submitting Punch In Request")
   page.get_by_role("button", name="Punch In").click()
-
-  # change this to wait for the punch in button to detect popup showed.
-  # page.wait_for_selector("div[class='vdl-modal__footer']")
-  print("Punched In ✅")
+  page.locator("text='submission successfully'").wait_for()
+  current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  print(f"Punched In ✅ at {current_date}")
 
 def punchOut(page):
   page.get_by_role("button", name="Punch Out").click()
   page.locator("text='submission successfully'").wait_for()
-  print("Punched Out ✅")
-  
+  current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  print(f"Punched Out ✅ at {current_date}")
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--punch", choices=["in", "out"], required=True, help="Specify punch action: in or out")
+args = parser.parse_args()
+
 with sync_playwright() as p:
   browser = p.chromium.launch(headless=False)
   context = browser.new_context()
@@ -40,7 +46,7 @@ with sync_playwright() as p:
 
   page = context.new_page()
   
-  page.goto("https://www.vista.adp.com/IN")
+  page.goto("https://online.apac.adp.com/signin/v1/?APPID=ADPVISTA-SG&productId=ff803a24-0ee0-47fc-e053-f282530bfabe&returnURL=https://www.vista.adp.com/sg/&callingAppId=ADPVISTA&TARGET=-SM-https://www.vista.adp.com/securtime/in/")
 
   idField = "#input"
   passwordField = "#input[type='password']"
@@ -50,28 +56,18 @@ with sync_playwright() as p:
   page.wait_for_selector(idField)
   page.fill(idField, userId)
   page.click(verifyBtn)
-
+  print(f'User Logging In - ', idField)
+  
   page.wait_for_selector(passwordField)
   page.fill(passwordField, password)
+
   page.click(signBtn)
+  print('User Sucessfully Logged In')
 
-  # dashboard page
-  page.wait_for_selector("div[class='vdl-modal__footer']")
-  page.locator("button", has_text="Try Later").click()
-
-  # expanding the sidebar
-  page.locator("sfc-shell-app-bar sdf-icon-button").click()
-
-  page.get_by_role("link", name="Me").click()
-
-  with page.expect_popup() as new_page_info:
-    page.get_by_role("link", name="Time & Attendance").click()
-  new_page = new_page_info.value
-  new_page.wait_for_load_state("networkidle")
-
-  # punchIn(new_page)
-  # punchOut(new_page)
+  if args.punch == "in":
+      punchIn(page)
+  elif args.punch == "out":
+      punchOut(page)
   
   page.pause()
-
   browser.close()
