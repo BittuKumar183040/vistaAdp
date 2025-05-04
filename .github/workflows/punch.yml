@@ -7,6 +7,16 @@ on:
     # Punch Out schedule at 6:00 PM IST (12:30 PM UTC)
     - cron: '30 12 * * *'
   workflow_dispatch:
+    inputs:
+      punch_type:
+        description: 'Select punch type'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - in
+          - out
 
 jobs:
   punch:
@@ -29,21 +39,27 @@ jobs:
 
       - name: Wait random delay (simulate human timing)
         run: |
-          delay=$(( ( RANDOM % 600 )  + 300 ))  # random between 300 and 900 seconds (5-15 mins)
+          delay=$(( ( RANDOM % 300 )  + 200 ))  # 5-15 mins
           echo "Sleeping for $delay seconds before punching..."
           sleep $delay
 
       - name: Determine Punch Type (In or Out)
         id: punch_type
         run: |
-          current_hour=$(date -u +"%H")
-          if [ "$current_hour" -eq 3 ]; then
-            echo "punch=in" >> $GITHUB_OUTPUT
-          elif [ "$current_hour" -eq 12 ]; then
-            echo "punch=out" >> $GITHUB_OUTPUT
+          punch="${{ github.event.inputs.punch_type }}"
+          if [ "$punch" != "" ]; then
+            echo "Manual trigger selected: $punch"
+            echo "punch=$punch" >> $GITHUB_OUTPUT
           else
-            echo "Invalid time, skipping punch"
-            exit 1
+            current_hour=$(date -u +"%H")
+            if [ "$current_hour" -eq 3 ]; then
+              echo "punch=in" >> $GITHUB_OUTPUT
+            elif [ "$current_hour" -eq 12 ]; then
+              echo "punch=out" >> $GITHUB_OUTPUT
+            else
+              echo "Invalid time, skipping punch"
+              exit 1
+            fi
           fi
 
       - name: Run Punch Automation
