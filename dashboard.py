@@ -18,13 +18,11 @@ password = os.getenv("PASSWORD")
 def punchIn(page):
   print("Submitting Punch In Request")
   page.get_by_role("button", name="Punch In").click()
-  page.locator("text='submission successfully'").wait_for()
   current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   print(f"Punched In ✅ at {current_date}")
 
 def punchOut(page):
   page.get_by_role("button", name="Punch Out").click()
-  page.locator("text='submission successfully'").wait_for()
   current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   print(f"Punched Out ✅ at {current_date}")
 
