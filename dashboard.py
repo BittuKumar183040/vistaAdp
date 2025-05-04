@@ -8,6 +8,9 @@ import random
 
 load_dotenv()
 
+LAT=12.912
+LON=77.644
+
 userId = os.getenv("USERID")
 password = os.getenv("PASSWORD")
 
@@ -28,8 +31,8 @@ with sync_playwright() as p:
   context = browser.new_context()
   context.grant_permissions(["geolocation"])
   
-  latitude = str(25.569) + str(int(round(random.random(), 3) * 1000))
-  longitude = str(85.093) + str(int(round(random.random(), 3) * 1000))
+  latitude = str(LAT) + str(int(round(random.random(), 3) * 1000))
+  longitude = str(LON) + str(int(round(random.random(), 3) * 1000))
 
   print(f"Latitude: {latitude}, Longitude: {longitude}")
 
@@ -39,13 +42,18 @@ with sync_playwright() as p:
   
   page.goto("https://www.vista.adp.com/IN")
 
-  page.wait_for_selector("input[id='login-form_username']")
-  page.fill("input[id='login-form_username']", userId)
-  page.click("button[id='verifUseridBtn']")
+  idField = "#input"
+  passwordField = "#input[type='password']"
+  verifyBtn = "#verifUseridBtn"
+  signBtn = "#signBtn"
 
-  page.wait_for_selector("input[id='login-form_password']")
-  page.fill("input[id='login-form_password']", password)
-  page.click("button[id='signBtn']")
+  page.wait_for_selector(idField)
+  page.fill(idField, userId)
+  page.click(verifyBtn)
+
+  page.wait_for_selector(passwordField)
+  page.fill(passwordField, password)
+  page.click(signBtn)
 
   # dashboard page
   page.wait_for_selector("div[class='vdl-modal__footer']")
@@ -58,7 +66,7 @@ with sync_playwright() as p:
 
   with page.expect_popup() as new_page_info:
     page.get_by_role("link", name="Time & Attendance").click()
-  new_page = new_page_info.value 
+  new_page = new_page_info.value
   new_page.wait_for_load_state("networkidle")
 
   # punchIn(new_page)
