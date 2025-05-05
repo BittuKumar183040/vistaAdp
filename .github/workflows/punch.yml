@@ -63,3 +63,24 @@ jobs:
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
           python dashboard.py --punch ${{ steps.punch_type.outputs.punch }}
+
+      - name: Send Punch Notification to Discord
+        if: steps.punch_type.outputs.punch == 'in' || steps.punch_type.outputs.punch == 'out'
+        run: |
+          punch_type="${{ steps.punch_type.outputs.punch }}"
+          if [ "$punch_type" = "in" ]; then
+            color=3066993  # Green
+          else
+            color=15158332 # Red
+          fi
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\": \"PunchBot\",
+            \"avatar_url\": \"https://i.imgur.com/4M34hi2.png\",
+            \"embeds\": [{
+              \"title\": \"✅ Punch $punch_type Recorded\",
+              \"description\": \"Punch **$punch_type** by **${{ github.actor }}** at $(date -u) UTC.\",
+              \"color\": $color
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
