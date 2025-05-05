@@ -46,12 +46,13 @@ jobs:
             echo "punch=$punch" >> $GITHUB_OUTPUT
           else
             current_hour=$(date -u +"%H")
+            echo "Processing Punch Time - $current_hour";
             if [ "$current_hour" -eq 3 ]; then
               echo "punch=in" >> $GITHUB_OUTPUT
             elif [ "$current_hour" -eq 12 ]; then
               echo "punch=out" >> $GITHUB_OUTPUT
             else
-              echo "Invalid time, skipping punch"
+              echo "Invalid time (got $current_hour), skipping punch"
               exit 1
             fi
           fi
