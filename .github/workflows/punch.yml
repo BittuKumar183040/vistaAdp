@@ -37,12 +37,6 @@ jobs:
           pip install -r requirements.txt
           playwright install chromium
 
-      - name: Wait random delay (simulate human timing)
-        run: |
-          delay=$(( ( RANDOM % 300 )  + 200 ))  # 5-15 mins
-          echo "Sleeping for $delay seconds before punching..."
-          sleep $delay
-
       - name: Determine Punch Type (In or Out)
         id: punch_type
         run: |
