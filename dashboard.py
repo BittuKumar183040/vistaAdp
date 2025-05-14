@@ -17,11 +17,13 @@ password = os.getenv("PASSWORD")
 
 def punchIn(page):
   print("Submitting Punch In Request")
+  page.wait_for_load_state("networkidle")
   page.get_by_role("button", name="Punch In").click()
   current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   print(f"Punched In ✅ at {current_date}")
 
 def punchOut(page):
+  page.wait_for_load_state("networkidle")
   page.get_by_role("button", name="Punch Out").click()
   current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
   print(f"Punched Out ✅ at {current_date}")
@@ -31,7 +33,7 @@ parser.add_argument("--punch", choices=["in", "out"], required=True, help="Speci
 args = parser.parse_args()
 
 with sync_playwright() as p:
-  browser = p.chromium.launch(headless=False)
+  browser = p.chromium.launch(headless=True)
   context = browser.new_context()
   context.grant_permissions(["geolocation"])
   
