@@ -31,7 +31,7 @@ parser.add_argument("--punch", choices=["in", "out"], required=True, help="Speci
 args = parser.parse_args()
 
 with sync_playwright() as p:
-  browser = p.chromium.launch(headless=True)
+  browser = p.chromium.launch(headless=False)
   context = browser.new_context()
   context.grant_permissions(["geolocation"])
   
