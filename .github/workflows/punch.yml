@@ -56,16 +56,36 @@ jobs:
               exit 1
             fi
           fi
-
-      - name: Run Punch Automation
+      - name: Run Punch Automation with Retry
+        id: punch_run
         env:
           USERID: ${{ secrets.USERID }}
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
-          python dashboard.py --punch ${{ steps.punch_type.outputs.punch }}
+          max_tries=5
+          count=0
+          success=0
 
-      - name: Send Punch Notification to Discord
-        if: steps.punch_type.outputs.punch == 'in' || steps.punch_type.outputs.punch == 'out'
+          while [ $count -lt $max_tries ]; do
+            echo "Attempt $((count+1)) of $max_tries"
+            if python dashboard.py --punch ${{ steps.punch_type.outputs.punch }}; then
+              success=1
+              break
+            fi
+            count=$((count+1))
+            echo "Attempt $count failed. Retrying..."
+            sleep 5
+          done
+
+          if [ $success -eq 1 ]; then
+            echo "Punch successful"
+            echo "result=success" >> $GITHUB_OUTPUT
+          else
+            echo "Punch failed after $max_tries attempts"
+            echo "result=failure" >> $GITHUB_OUTPUT
+          fi
+      - name: Send Punch Notification to Discord (Success)
+        if: steps.punch_run.outputs.result == 'success' && (steps.punch_type.outputs.punch == 'in' || steps.punch_type.outputs.punch == 'out')
         run: |
           punch_type="${{ steps.punch_type.outputs.punch }}"
           if [ "$punch_type" = "in" ]; then
@@ -82,5 +102,20 @@ jobs:
               \"title\": \"✅ Punch $punch_type Recorded\",
               \"description\": \"Punch **$punch_type** by **${{ github.actor }}** at $(date -u) UTC.\",
               \"color\": $color
+            }]
+          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Send Punch Failure Notification to Discord
+        if: steps.punch_run.outputs.result == 'failure'
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\": \"PunchBot\",
+            \"avatar_url\": \"https://i.imgur.com/4M34hi2.png\",
+            \"embeds\": [{
+              \"title\": \"❌ Punch Failed\",
+              \"description\": \"Punch **${{ steps.punch_type.outputs.punch }}** by **${{ github.actor }}** failed after 5 attempts at $(date -u) UTC.\",
+              \"color\": 15158332
             }]
           }" ${{ secrets.DISCORD_WEBHOOK_URL }}

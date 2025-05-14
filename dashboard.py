@@ -60,7 +60,7 @@ with sync_playwright() as p:
   page.fill(passwordField, password)
 
   page.click(signBtn)
-  print('User Sucessfully Logged In')
+  print('User Successfully Logged In')
 
   if args.punch == "in":
       punchIn(page)
