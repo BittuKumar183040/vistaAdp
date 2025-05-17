@@ -1,11 +1,11 @@
-name: Punch Automation
+name: ADP Punching Automation 🤣
 
 on:
   schedule:
     # Punch In schedule at 9:00 AM IST (3:30 AM UTC)
-    - cron: '30 3 * * *'
+    - cron: '30 3 * * 1-6'
     # Punch Out schedule at 6:00 PM IST (12:30 PM UTC)
-    - cron: '30 12 * * *'
+    - cron: '30 12 * * 1-6'
   workflow_dispatch:
     inputs:
       punch_type:
