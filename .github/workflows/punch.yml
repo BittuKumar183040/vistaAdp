@@ -47,7 +47,7 @@ jobs:
           else
             current_hour=$(date -u +"%H")
             echo "Processing Punch Time - $current_hour";
-            if [ "$current_hour" -ge 3 ] && [ "$current_hour" -lt 4 ]; then
+            if [ "$current_hour" -ge 3 ] && [ "$current_hour" -lt 5 ]; then
               echo "punch=in" >> $GITHUB_OUTPUT
             elif [ "$current_hour" -ge 12 ] && [ "$current_hour" -lt 14 ]; then
               echo "punch=out" >> $GITHUB_OUTPUT
