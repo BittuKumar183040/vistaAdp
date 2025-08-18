@@ -20,12 +20,14 @@ def punchIn(page):
   page.wait_for_load_state("networkidle")
   page.get_by_role("button", name="Punch In").click()
   current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  time.sleep(3)
   print(f"Punched In ✅ at {current_date}")
 
 def punchOut(page):
   page.wait_for_load_state("networkidle")
   page.get_by_role("button", name="Punch Out").click()
   current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  time.sleep(3)
   print(f"Punched Out ✅ at {current_date}")
 
 parser = argparse.ArgumentParser()
