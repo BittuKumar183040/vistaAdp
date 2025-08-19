@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 import random         
 from datetime import datetime
+import time
 
 load_dotenv()
 
@@ -72,4 +73,5 @@ with sync_playwright() as p:
       punchOut(page)
   
   # page.pause()
+
   browser.close()
