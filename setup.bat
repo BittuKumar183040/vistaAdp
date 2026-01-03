@@ -21,8 +21,10 @@ REM
 playwright install
 
 REM
-set /p USERID=Enter USERID (default:user_id): 
-set /p PASSWORD=Enter PASSWORD (default:user_pass): 
+set /p USERID=Enter USERID (default:user_id):
+set /p PASSWORD=Enter PASSWORD (default:user_pass):
+set /p LAT=Enter LATITUDE (default:87.47):
+set /p LON=Enter LONGITUTE (default:74.34):
 (
 	echo USERID=%USERID%
 	echo PASSWORD=%PASSWORD%
@@ -31,4 +33,5 @@ set /p PASSWORD=Enter PASSWORD (default:user_pass):
 ) > .env
 
 echo Setup complete :)
+
 pause
