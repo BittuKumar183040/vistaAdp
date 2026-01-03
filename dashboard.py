@@ -10,9 +10,8 @@ import time
 
 load_dotenv()
 
-LAT=25.569
-LON=85.093
-
+LAT=os.getenv("LAT", 25.569)
+LON=os.getenv("LON", 85.093)
 userId = os.getenv("USERID")
 password = os.getenv("PASSWORD")
 
