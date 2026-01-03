@@ -61,8 +61,10 @@ jobs:
         env:
           USERID: ${{ secrets.USERID }}
           PASSWORD: ${{ secrets.PASSWORD }}
+          LAT: ${{ secrets.LAT }}
+          LON: ${{ secrets.LON }}
         run: |
-          max_tries=5
+          max_tries=1
           count=0
           success=0
 
@@ -119,3 +121,4 @@ jobs:
               \"color\": 15158332
             }]
           }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
